@@ -2,20 +2,19 @@
 import socketio
 
 sio = socketio.Client()
-
+username = input("Enter your username: ")
 
 @sio.event
 def connect():
     print("Successfully connected to the server!")
 
-    sio.emit("send_message", {
-        "message": "Hello server!"
-    })
-
+    sio.emit("register", {"username": username})
     
+
+
 @sio.on("receive_message")
 def handle_message(data):
-    print("Server says:", data["message"])
+    print(f"{data['sender']} says: {data['message']}")
 
 @sio.event
 def disconnect():
@@ -24,4 +23,11 @@ def disconnect():
 
 sio.connect("http://192.168.100.28:5000")
 
-sio.wait()
+while True:
+    recipient = input("Who do you want to message? ")
+    message = input("Enter your message: ")
+
+    sio.emit("send_message", {
+        "recipient": recipient,
+        "message": message
+    })
